@@ -1,0 +1,70 @@
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.content {
+  padding: 10px;
+}
+
+.AppContent {
+  &-pushable {
+    transform: none !important;
+    &__pusher {
+      overflow: auto;
+    }
+
+    .appDesctop {
+      margin-left: 150px;
+    }
+  }
+
+  .full {
+    &-heght {
+      min-height: 99vh !important;
+    }
+  }
+
+  #sidebar {
+    position: fixed;
+    width: 150px;
+    background: #e4e4e4;
+  }
+
+  .showSidebarIcon {
+    position: fixed;
+    z-index: 101;
+    top: 50%;
+  }
+}
+
+.pageHeader {
+  padding: 5px;
+  &-header {
+    display: flex;
+    padding: 5px;
+    &__name {
+      padding: 10px;
+    }
+    &__search {
+      margin: 5px;
+      margin-left: auto;
+    }
+  }
+}
+
+.actionsBar {
+  z-index: 101;
+  position: fixed;
+  right: 2%;
+  bottom: 2%;
+}
+
+.ui.fullscreen.modal {
+  left: 2.5% !important;
+}
