@@ -11,7 +11,6 @@ export default ({setNewObject}) => {
 		getInputProps,
 		isDragActive
 	} = useDropzone()
-	console.log(acceptedFiles)
 
 	useEffect(() => {
 		let toUploadHolder = toUpload.slice()

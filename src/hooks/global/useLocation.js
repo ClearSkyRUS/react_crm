@@ -1,25 +1,33 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import queryString from 'query-string'
 import { useHistory } from "react-router-dom"
 
-const useLocation = () => {
+const useLocation = model => {
+	const _history = useHistory()
 	const [isSync, setSync] = useState(false)
-	const history = useHistory();
-	const pageState = getLocationObj(history)
-	const setHistory = param => {
-		const query = `?${queryString.stringify(Object.assign({}, pageState.params, param))}`
-		history.push({ search: query })
+	const [history, setHistory] = useState({})
+	const addToHistory = param => {
+		setHistory({
+			...history,
+			...param
+		})
 	}
-	return { pageState, history, setHistory, isSync, setSync }
+	useEffect(() => {
+		const modelToSet = !model
+			? queryString.parse(_history.location.search).model
+			: model
+		addToHistory({model: modelToSet})
+	}, [_history.location.search])
+	const pageState = getLocationObj(history)
+	return { pageState, history, addToHistory, isSync, setSync }
 }
 
-const getLocationObj = (history) => {
-	const params = queryString.parse(history.location.search)
+const getLocationObj = (params) => {
 	const firstParam = Object.keys(params)[0]
 	return {
-		title: history.location.search !== '' ? `${firstParam}: ${params[firstParam]}` : history.location.pathname === '/' ? 'home' : 'some',
+		title: queryString.stringify(params) !== '' ? `${firstParam}: ${params[firstParam]}` : 'home',
 		params: params,
-		search: history.location.search
+		search: '?' + queryString.stringify(params)
 	}
 }
 

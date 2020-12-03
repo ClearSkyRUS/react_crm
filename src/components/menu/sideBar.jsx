@@ -23,7 +23,7 @@ export default ({isSidebarVisible, isMobile, setIsSidebarVisible, store}) => {
 					<Menu.Item>
 						<Menu.Header>Models</Menu.Header>
 						<Menu.Menu>
-							{store.models?.map((model, key) => (
+							{store.models?.filter(model => model.images?.backList).map((model, key) => (
 								<Link to={`/models?model=${model.name}`} key={key}>
 									<Menu.Item active={pageState.params.model === model.name}>
 										{model.name}

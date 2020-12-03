@@ -1,7 +1,7 @@
 import React, {useState, useContext} from "react"
 import {Form, TextArea, Input, Segment, Dimmer, Loader} from "semantic-ui-react"
 import Modal from "./modal"
-import Page from "./page"
+import {ModelPage} from "containers"
 import {ItemsContext} from "context"
 import {request} from "actions"
 import {modelsApi} from "utils/api"
@@ -75,7 +75,7 @@ export default ({multi, modelName, value, setValue, field}) => {
 		request(
 			modelsApi,
 			"get",
-			`?model=${model?.name}&search=${
+			`?model=${model?.name}&image=list&search=${
 				withSearch !== undefined ? withSearch : search
 			}&page=${page}&limit=5`,
 			null,
@@ -112,29 +112,12 @@ export default ({multi, modelName, value, setValue, field}) => {
 					multi={multi}
 					selected={multi ? value.length : (value !== null).toString()}
 				>
-					{pages[0]?.docs?.length ? (
-						<Page
-							model={model}
-							pages={pages}
-							onBottom={onBottom}
-							selected={value}
-							onSelect={onSelectItem}
-							multi={multi}
-						/>
-					) : (
-						""
-					)}
-					{onLoad ? (
-						<Segment style={{height: "100px"}}>
-							<Dimmer active inverted>
-								<Loader inverted active inline="centered">
-									Loading
-								</Loader>
-							</Dimmer>
-						</Segment>
-					) : (
-						""
-					)}
+					<ModelPage
+						pageModel={model?.name}
+						selected={value}
+						onSelect={onSelectItem}
+						multi={multi}
+					/>
 				</Modal>
 			) : (
 				""

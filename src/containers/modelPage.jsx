@@ -4,12 +4,14 @@ import {ItemsContext} from "context"
 import {modelsApi} from "utils/api"
 import {request} from "actions"
 
-import {Button, Loader, Dimmer, Segment} from "semantic-ui-react"
+import {Button, Loader, Dimmer, Segment, Input} from "semantic-ui-react"
 
 import {ModelList, ModelModal} from "components"
 
-const ModelPage = () => {
-	const {pageState, history, setHistory, isSync, setSync} = useLocation()
+const ModelPage = ({pageModel, selected, onSelect, multi}) => {
+	const {pageState, history, addToHistory, isSync, setSync} = useLocation(
+		pageModel
+	)
 	const {store, dispatch} = useContext(ItemsContext)
 	const [isOpen, setOpen] = useState(false)
 	const [upload, setUpload] = useState(false)
@@ -18,13 +20,16 @@ const ModelPage = () => {
 		(obj) => obj.name === pageState.params.model
 	)
 	const currentModelName = pageState.params.model
-	const currentModelData =
-		currentModelName && store.modelsData
-			? store.modelsData[currentModelName]
-			: null
+	const currentModelData = store?.modelsData?.[currentModelName]
+
 	const editItem = (item) => {
-		setToEdit(item)
-		setOpen(true)
+		const params = `?model=${currentModelName}&_id=${item._id}&image=findOne`
+		request(modelsApi, "get", params, null, (data) => {
+			if (data) {
+				setToEdit(data)
+				setOpen(true)
+			}
+		})
 	}
 	const closeModal = (bySync) => {
 		if (bySync || window.confirm("Sure you want to close without save?")) {
@@ -33,12 +38,16 @@ const ModelPage = () => {
 			setToEdit({})
 		}
 	}
-	const sync = () => {
+	const sync = (withModels = false) => {
+		if (!pageState.params.model) return
 		setSync(true)
-		request(modelsApi, "getModels", "", null, (data) => {
-			setModels(data)
-			updateList()
-		})
+		if (withModels) {
+			request(modelsApi, "getModels", "", null, (data) => {
+				setModels(data)
+				updateList()
+			})
+		}
+		updateList()
 		closeModal(true)
 	}
 	const setModels = (data) => {
@@ -48,7 +57,12 @@ const ModelPage = () => {
 		})
 	}
 	const updateList = () => {
-		request(modelsApi, "get", pageState.search, "SET", (data) => {
+		const model = store.models.find(
+			(model) => model.name === pageState.params.model
+		)
+		const image = model?.images?.backList ? "backList" : "list"
+		const params = `${pageState.search}&image=${image}`
+		request(modelsApi, "get", params, "SET", (data) => {
 			setModelsData(data)
 			endRequest()
 		})
@@ -76,18 +90,20 @@ const ModelPage = () => {
 	}
 	const paginate = (e, {activePage}) => {
 		setSync(true)
-		setHistory({page: activePage})
+		addToHistory({page: activePage})
 	}
 	const deleteItem = (id) => {
 		setUpload(true)
 		if (window.confirm("Sure you want to delete?")) {
-			request(modelsApi, "delete", `${pageState.search}&id=${id}`, null, sync)
+			request(modelsApi, "delete", `${pageState.search}&id=${id}`, null, () =>
+				sync(currentModelName === "model")
+			)
 		}
 	}
 	const createItem = (item) => {
 		setUpload(true)
 		request(modelsApi, "post", pageState.search, item, (data) =>
-			data ? sync() : setUpload(false)
+			data ? sync(currentModelName === "model") : setUpload(false)
 		)
 	}
 	const updateItem = (item) => {
@@ -96,13 +112,37 @@ const ModelPage = () => {
 			data ? sync() : setUpload(false)
 		)
 	}
+	const setSearch = (queryVal) => {
+		addToHistory({search: queryVal})
+	}
 
 	useEffect(() => {
 		sync()
-	}, [history.location])
+	}, [pageState.search])
 
 	return (
 		<Segment className="full-heght">
+			<Button
+				className="actionsBar__sync"
+				onClick={() => sync()}
+				circular
+				icon="sync"
+			/>
+			<Button
+				className="actionsBar__add"
+				onClick={() => setOpen(true)}
+				circular
+				color="google plus"
+				icon="plus"
+			/>
+			<Input
+				value={pageState.params.search ? pageState.params.search : ""}
+				onChange={(e, {value}) => setSearch(value)}
+				className="pageHeader-header__search"
+				icon="search"
+				size="mini"
+				placeholder="Search..."
+			/>
 			<Dimmer
 				active={
 					isSync ||
@@ -123,6 +163,9 @@ const ModelPage = () => {
 							deleteItem={deleteItem}
 							setToEdit={editItem}
 							paginate={paginate}
+							selected={selected}
+							onSelect={onSelect}
+							multi={multi}
 							setActive={
 								currentModel.schemaObj.isActive ? updateItem : undefined
 							}
@@ -142,21 +185,6 @@ const ModelPage = () => {
 			) : (
 				""
 			)}
-			<div className="actionsBar">
-				<Button
-					className="actionsBar__sync"
-					onClick={sync}
-					circular
-					icon="sync"
-				/>
-				<Button
-					className="actionsBar__add"
-					onClick={() => setOpen(true)}
-					circular
-					color="google plus"
-					icon="plus"
-				/>
-			</div>
 		</Segment>
 	)
 }

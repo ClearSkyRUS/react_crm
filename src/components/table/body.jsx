@@ -114,20 +114,18 @@ const TableRow = ({
 		</Table.Cell>
 		{keys.map((field, keyI) => (
 			<Table.Cell key={keyI}>
-				{el[field] === undefined && field === "imagePreview" ? (
+				{field === "imagePreview" ? (
 					<div style={{display: "flex", width: "80px", margin: "auto"}}>
 						<Img
 							style={{margin: "auto", width: "80px"}}
 							src={[
-								el.contentType?.startsWith("image/")
-									? `${apiUrl}file?width=80&id=${el._id}`
-									: "assets/images/holder.png",
+								`${apiUrl}file?width=80&id=${el[field] || el._id}`,
 								"assets/images/holder.png"
 							]}
 							loader={<Loader style={{margin: "auto"}} active inline />}
 						/>
 					</div>
-				) : typeof el[field] === "object" ? (
+				) : el[field] && typeof el[field] === "object" ? (
 					<ReactJson
 						collapsed={1}
 						enableClipboard={false}

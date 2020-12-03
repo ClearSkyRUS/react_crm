@@ -10,7 +10,10 @@ export default ({
 	deleteItem,
 	setToEdit,
 	paginate,
-	setActive
+	setActive,
+	selected,
+	onSelect,
+	multi
 }) => (
 	<Table
 		headArr={model.preview}
@@ -20,5 +23,8 @@ export default ({
 		setToEdit={setToEdit}
 		paginate={paginate}
 		setActive={setActive}
+		selected={selected}
+		onSelect={onSelect}
+		multi={multi}
 	/>
 )
