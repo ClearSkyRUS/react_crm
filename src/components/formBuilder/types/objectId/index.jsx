@@ -28,7 +28,7 @@ export default ({multi, modelName, value, setValue, field}) => {
 	const [onLoad, setOnLoad] = useState(false)
 
 	const SetModelByName = () => {
-		setModel(store.models.find((obj) => obj?.name === modelName))
+		setModel(store.models?.find((obj) => obj?.name === modelName))
 	}
 
 	if (model === null) {

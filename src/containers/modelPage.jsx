@@ -43,6 +43,7 @@ const ModelPage = ({pageModel, selected, onSelect, multi}) => {
 		setSync(true)
 		if (withModels) {
 			request(modelsApi, "getModels", "", null, (data) => {
+				if (!Array.isArray(data)) return
 				setModels(data)
 				updateList()
 			})
@@ -57,7 +58,7 @@ const ModelPage = ({pageModel, selected, onSelect, multi}) => {
 		})
 	}
 	const updateList = () => {
-		const model = store.models.find(
+		const model = store.models?.find(
 			(model) => model.name === pageState.params.model
 		)
 		const image = model?.images?.backList ? "backList" : "list"

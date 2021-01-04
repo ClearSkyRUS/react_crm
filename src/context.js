@@ -18,6 +18,7 @@ const Context = ({ children }) => {
 	}, [])
 
 	const setModels = data => {
+		if (!Array.isArray(data)) return
 		dispatch({
 			type: 'SET',
 			payload: { models: data }
