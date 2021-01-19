@@ -1,6 +1,5 @@
-import React, {useContext, useState} from "react"
-import {Form, Checkbox, Input, TextArea} from "semantic-ui-react"
-import {Dropzone} from "components"
+import React, {useState} from "react"
+import {Form} from "semantic-ui-react"
 
 import {Object, Array, Boolean, Simple, ObjectId} from "./types"
 

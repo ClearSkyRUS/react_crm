@@ -19,7 +19,7 @@ export default ({
 		if (openStatus === true) {
 			setNewObject(editMode ? JSON.parse(JSON.stringify(toEdit)) : {})
 		} else setNewObject(null)
-	}, [openStatus])
+	}, [openStatus, editMode, toEdit])
 	if (newObject === null) return ""
 	return (
 		<div>

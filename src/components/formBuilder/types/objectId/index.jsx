@@ -1,5 +1,5 @@
 import React, {useState, useContext} from "react"
-import {Form, TextArea, Input, Segment, Dimmer, Loader} from "semantic-ui-react"
+import {Form} from "semantic-ui-react"
 import Modal from "./modal"
 import {ModelPage} from "containers"
 import {ItemsContext} from "context"
@@ -64,10 +64,6 @@ export default ({multi, modelName, value, setValue, field}) => {
 		} else {
 			setValue(null)
 		}
-	}
-
-	const onBottom = () => {
-		if (state.totalPages > state.page) getPage(state.page + 1)
 	}
 
 	const getPage = (page, withSearch) => {

@@ -1,19 +1,12 @@
-import React, {useCallback, useState, useEffect} from "react"
+import React, {useState, useCallback} from "react"
 import {useDropzone} from "react-dropzone"
-import {Segment, Icon, Dimmer, Loader} from "semantic-ui-react"
+import {Segment, Icon} from "semantic-ui-react"
 
 export default ({setNewObject}) => {
-	const [uploaded, setUploaded] = useState(false)
 	const [toUpload, setToUpload] = useState([])
-	const {
-		acceptedFiles,
-		getRootProps,
-		getInputProps,
-		isDragActive
-	} = useDropzone()
 
-	useEffect(() => {
-		let toUploadHolder = toUpload.slice()
+	const onDrop = useCallback(acceptedFiles => {
+    let toUploadHolder = toUpload.slice()
 		toUploadHolder = acceptedFiles.concat(
 			toUploadHolder.filter(
 				(i) =>
@@ -26,7 +19,12 @@ export default ({setNewObject}) => {
 		let files = new FormData()
 		toUploadHolder.forEach((file) => files.append("files", file))
 		setNewObject(files)
-	}, [acceptedFiles])
+  }, [toUpload, setNewObject])
+	const {
+		getRootProps,
+		getInputProps,
+		isDragActive
+	} = useDropzone({onDrop})
 
 	return (
 		<Segment>

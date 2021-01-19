@@ -6,7 +6,7 @@ import {ItemsContext} from "context"
 
 import {useWindow} from "hooks"
 
-import {Segment, Sidebar, Container, Button} from "semantic-ui-react"
+import {Segment, Sidebar, Container} from "semantic-ui-react"
 
 import {MainPage, ModelPage, LoginForm} from "containers"
 

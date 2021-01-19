@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useContext} from "react"
+import React, {useEffect, useState, useContext, useCallback} from "react"
 import {useLocation} from "hooks"
 import {ItemsContext} from "context"
 import {modelsApi} from "utils/api"
@@ -9,7 +9,7 @@ import {Button, Loader, Dimmer, Segment, Input} from "semantic-ui-react"
 import {ModelList, ModelModal} from "components"
 
 const ModelPage = ({pageModel, selected, onSelect, multi}) => {
-	const {pageState, history, addToHistory, isSync, setSync} = useLocation(
+	const {pageState, addToHistory, isSync, setSync} = useLocation(
 		pageModel
 	)
 	const {store, dispatch} = useContext(ItemsContext)
@@ -38,45 +38,25 @@ const ModelPage = ({pageModel, selected, onSelect, multi}) => {
 			setToEdit({})
 		}
 	}
-	const sync = (withModels = false) => {
-		if (!pageState.params.model) return
-		setSync(true)
-		if (withModels) {
-			request(modelsApi, "getModels", "", null, (data) => {
-				if (!Array.isArray(data)) return
-				setModels(data)
-				updateList()
-			})
-		}
-		updateList()
-		closeModal(true)
-	}
-	const setModels = (data) => {
+	const setModels = useCallback(data => {
 		dispatch({
 			type: "SET",
 			payload: {models: data}
 		})
-	}
-	const updateList = () => {
-		const model = store.models?.find(
-			(model) => model.name === pageState.params.model
-		)
-		const image = model?.images?.backList ? "backList" : "list"
-		const params = `${pageState.search}&image=${image}`
-		request(modelsApi, "get", params, "SET", (data) => {
-			setModelsData(data)
-			endRequest()
-		})
-	}
-	const setModelsData = (data) => {
+	}, [dispatch])
+	const setModelsData = useCallback(data => {
 		dispatch({
 			type: "SET",
 			payload: {
 				modelsData: {[currentModelName]: data}
 			}
 		})
-	}
-	const endRequest = (data) => {
+	}, [dispatch, currentModelName])
+	const paginate = useCallback((e, {activePage}) => {
+		setSync(true)
+		addToHistory({page: activePage})
+	}, [setSync, addToHistory])
+	const endRequest = useCallback(data => {
 		if (
 			data &&
 			pageState.params.page &&
@@ -88,11 +68,32 @@ const ModelPage = ({pageModel, selected, onSelect, multi}) => {
 			})
 		setSync(false)
 		setUpload(false)
-	}
-	const paginate = (e, {activePage}) => {
+	}, [pageState.params.page, paginate, setSync])
+	const updateList = useCallback(() => {
+		const model = store.models?.find(
+			(model) => model.name === pageState.params.model
+		)
+		const image = model?.images?.backList ? "backList" : "list"
+		const params = `${pageState.search}&image=${image}`
+		request(modelsApi, "get", params, "SET", (data) => {
+			setModelsData(data)
+			endRequest()
+		})
+	}, [pageState.params.model, pageState.search, store.models, endRequest, setModelsData])
+	const sync = useCallback((withModels = false) => {
+		if (!pageState.params.model) return
 		setSync(true)
-		addToHistory({page: activePage})
-	}
+		if (withModels) {
+			request(modelsApi, "getModels", "", null, (data) => {
+				if (!Array.isArray(data)) return
+				setModels(data)
+				updateList()
+			})
+		}
+		updateList()
+		closeModal(true)
+	}, [pageState.params.model, setModels, updateList, setSync])
+
 	const deleteItem = (id) => {
 		setUpload(true)
 		if (window.confirm("Sure you want to delete?")) {
@@ -113,13 +114,12 @@ const ModelPage = ({pageModel, selected, onSelect, multi}) => {
 			data ? sync() : setUpload(false)
 		)
 	}
+
 	const setSearch = (queryVal) => {
 		addToHistory({search: queryVal})
 	}
 
-	useEffect(() => {
-		sync()
-	}, [pageState.search])
+	useEffect(() => sync(), [pageState.search, sync])
 
 	return (
 		<Segment className="full-heght">

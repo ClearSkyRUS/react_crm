@@ -4,7 +4,6 @@ import {
 	Checkbox,
 	Button,
 	Visibility,
-	Image,
 	Loader
 } from "semantic-ui-react"
 import Img from "react-image"
